@@ -3,6 +3,7 @@
 require "jekyll"
 require "nokogiri"
 require "uri"
+require "addressable/uri"
 
 module Jekyll
   class TargetBlank
@@ -193,7 +194,10 @@ module Jekyll
       # link - a url.
       def external?(link)
         if link&.match?(URI.regexp(%w(http https)))
-          URI.parse(link).host != URI.parse(@site_url).host
+          # non-ascii uri에 대한 Invalid URI 예외 오류 수정
+          # 방어 코드인 URI.escape()가 ruby 2.7부터 obsolete 되어서 사용할 수 없는 문제
+          # URI.parse(link).host != URI.parse(@site_url).host
+          Addressable::URI.parse(link).host != Addressable::URI.parse(@site_url).host
         end
       end
 
